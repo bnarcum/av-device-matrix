@@ -89,6 +89,37 @@ export const VENDORS: Record<VendorId, VendorConfig> = {
   },
 }
 
+/** Text on filled vendor pills (topbar active buttons + device labels). */
+export const VENDOR_LABEL_ON_PRIMARY = '#001724'
+
+export const SELECTION_ACCENT = '#049FD9'
+
+export interface VendorLabelTheme {
+  background: string
+  color: string
+  border: string
+}
+
+/** Matches topbar `button[data-active='true']` fill per manufacturer. */
+export function vendorLabelTheme(
+  vendorId: VendorId,
+  selected = false,
+): VendorLabelTheme {
+  const { primary, secondary } = vendorConfig(vendorId)
+  if (selected) {
+    return {
+      background: SELECTION_ACCENT,
+      color: VENDOR_LABEL_ON_PRIMARY,
+      border: SELECTION_ACCENT,
+    }
+  }
+  return {
+    background: primary,
+    color: VENDOR_LABEL_ON_PRIMARY,
+    border: vendorId === 'neat' ? secondary : primary,
+  }
+}
+
 export function vendorConfig(vendorId: VendorId): VendorConfig {
   return VENDORS[vendorId]
 }

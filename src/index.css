@@ -71,6 +71,7 @@ button:hover {
 
 /* Selected / toggled-on pills — scoped so highlight states elsewhere
    (e.g. search keyboard focus) don't inherit solid-fill + dark text. */
+.vendor-switch button[data-active='true'],
 .mode-switch button[data-active='true'],
 .filters button[data-active='true'],
 .compare-tray button[data-active='true'],
@@ -663,23 +664,32 @@ a:hover {
 .drawer .vendor-tag {
   display: inline-block;
   font-size: 0.65rem;
+  font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--fg-3);
   margin-left: 0.5rem;
   margin-bottom: 0.4rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
 }
 
 .drawer .vendor-tag[data-vendor='logitech'] {
-  color: #00b8fc;
+  background: #00b8fc;
+  border-color: #00b8fc;
+  color: #001724;
 }
 
 .drawer .vendor-tag[data-vendor='poly'] {
-  color: #6161ff;
+  background: #6161ff;
+  border-color: #6161ff;
+  color: #001724;
 }
 
 .drawer .vendor-tag[data-vendor='neat'] {
-  color: #a3a3a3;
+  background: #ffffff;
+  border-color: #a3a3a3;
+  color: #001724;
 }
 
 .drawer .tagline {
@@ -1418,15 +1428,33 @@ a:hover {
 }
 
 .aisle-tile[data-vendor='logitech'] .aisle-tile-name {
-  color: #00b8fc;
+  display: inline-block;
+  max-width: 100%;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #00b8fc;
+  border: 1px solid #00b8fc;
+  color: #001724;
 }
 
 .aisle-tile[data-vendor='poly'] .aisle-tile-name {
-  color: #6161ff;
+  display: inline-block;
+  max-width: 100%;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #6161ff;
+  border: 1px solid #6161ff;
+  color: #001724;
 }
 
 .aisle-tile[data-vendor='neat'] .aisle-tile-name {
-  color: #e8eaed;
+  display: inline-block;
+  max-width: 100%;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid #a3a3a3;
+  color: #001724;
 }
 
 .aisle-tile-meta {
