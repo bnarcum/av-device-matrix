@@ -7,6 +7,7 @@ import { DeviceModel } from './DeviceModel'
 import { PhotoBillboard } from './PhotoBillboard'
 import { deviceImage } from '../data/deviceImages'
 import { useReducedMotion } from '../hooks/useReducedMotion'
+import { DeviceFloatingLabel } from '../ui/DeviceFloatingLabel'
 
 interface Props {
   device: Device
@@ -126,20 +127,11 @@ export function DevicePedestal({
           distanceFactor={6}
           zIndexRange={[1, 0]}
         >
-          <div
-            style={{
-              padding: '4px 10px',
-              borderRadius: 999,
-              background: 'rgba(5,8,15,0.7)',
-              border: `1px solid ${selected ? '#049FD9' : 'rgba(255,255,255,0.1)'}`,
-              fontSize: 11,
-              color: '#fff',
-              whiteSpace: 'nowrap',
-              backdropFilter: 'blur(6px)',
-            }}
-          >
-            {device.name}
-          </div>
+          <DeviceFloatingLabel
+            name={device.name}
+            vendorId={device.vendorId}
+            selected={selected}
+          />
         </Html>
       )}
     </group>

@@ -10,6 +10,7 @@ import {
 } from '@react-three/drei'
 import type { Category, Device, RoomSize } from '../data/types'
 import { DevicePedestal } from '../three/DevicePedestal'
+import { DeviceFloatingLabel } from '../ui/DeviceFloatingLabel'
 import { SceneEnv } from '../three/SceneEnv'
 import { ShowroomFloor } from '../three/ShowroomFloor'
 import { deviceImage } from '../data/deviceImages'
@@ -136,25 +137,12 @@ export function FinderScene({
                 style={{ pointerEvents: 'none' }}
                 zIndexRange={[1, 0]}
               >
-                <div
-                  style={{
-                    padding: '4px 9px',
-                    borderRadius: 999,
-                    background: 'rgba(5,8,15,0.85)',
-                    border: `1px solid ${
-                      selected?.id === d.id
-                        ? '#049fd9'
-                        : 'rgba(255,255,255,0.14)'
-                    }`,
-                    fontSize: 11,
-                    color: '#fff',
-                    whiteSpace: 'nowrap',
-                    backdropFilter: 'blur(6px)',
-                    pointerEvents: 'none',
-                  }}
-                >
-                  {d.name}
-                </div>
+                <DeviceFloatingLabel
+                  name={d.name}
+                  vendorId={d.vendorId}
+                  selected={selected?.id === d.id}
+                  style={{ pointerEvents: 'none' }}
+                />
               </Html>
             )}
           </FlyTo>

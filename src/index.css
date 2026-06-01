@@ -670,6 +670,18 @@ a:hover {
   margin-bottom: 0.4rem;
 }
 
+.drawer .vendor-tag[data-vendor='logitech'] {
+  color: #00b8fc;
+}
+
+.drawer .vendor-tag[data-vendor='poly'] {
+  color: #6161ff;
+}
+
+.drawer .vendor-tag[data-vendor='neat'] {
+  color: #a3a3a3;
+}
+
 .drawer .tagline {
   color: var(--fg-2);
   font-size: 0.9rem;
@@ -1403,6 +1415,18 @@ a:hover {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.aisle-tile[data-vendor='logitech'] .aisle-tile-name {
+  color: #00b8fc;
+}
+
+.aisle-tile[data-vendor='poly'] .aisle-tile-name {
+  color: #6161ff;
+}
+
+.aisle-tile[data-vendor='neat'] .aisle-tile-name {
+  color: #e8eaed;
 }
 
 .aisle-tile-meta {

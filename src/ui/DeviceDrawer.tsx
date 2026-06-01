@@ -54,7 +54,12 @@ export function DeviceDrawer({
             <header className="drawer-header">
               <div>
                 <div className="tag">{CATEGORY_LABELS[device.category]}</div>
-                <div className="vendor-tag">{VENDOR_LABELS[device.vendorId]}</div>
+                <div
+                  className="vendor-tag"
+                  data-vendor={device.vendorId}
+                >
+                  {VENDOR_LABELS[device.vendorId]}
+                </div>
                 <h2>{device.name}</h2>
               </div>
               <button onClick={onClose} aria-label="Close details">

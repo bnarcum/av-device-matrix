@@ -321,6 +321,7 @@ function Tile({ device, size, selected, onSelect, registerTile }: TileProps) {
       ref={ref}
       type="button"
       className={`aisle-tile aisle-tile--${size}`}
+      data-vendor={device.vendorId}
       data-selected={selected ? 'true' : 'false'}
       aria-label={`${device.name} — ${device.family}`}
       onClick={() => onSelect(device)}
