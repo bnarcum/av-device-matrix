@@ -1,0 +1,94 @@
+import type { VendorId } from './types'
+
+export interface VendorResourceLink {
+  label: string
+  url: string
+  meta?: string
+  icon?: string
+}
+
+export interface VendorConfig {
+  id: VendorId
+  name: string
+  website: string
+  primary: string
+  secondary: string
+  disclaimer: string
+  resourceLinks: VendorResourceLink[]
+}
+
+export const VENDORS: Record<VendorId, VendorConfig> = {
+  logitech: {
+    id: 'logitech',
+    name: 'Logitech',
+    website: 'https://www.logitech.com/en-us/business/video-conferencing.html',
+    primary: '#00b8fc',
+    secondary: '#0078d4',
+    disclaimer:
+      'Specifications summarized from publicly available Logitech product documentation. This site is unaffiliated with Logitech.',
+    resourceLinks: [
+      {
+        label: 'Logitech Sync ↗',
+        url: 'https://www.logitech.com/en-us/software/sync.html',
+        meta: 'Device management',
+        icon: '⊞',
+      },
+      {
+        label: 'Room configurator ↗',
+        url: 'https://www.logitech.com/en-us/business/video-conferencing/room-configurator.html',
+        meta: 'Plan a room',
+        icon: '⌗',
+      },
+    ],
+  },
+  poly: {
+    id: 'poly',
+    name: 'Poly',
+    website: 'https://www.poly.com/us/en/products/video-conferencing',
+    primary: '#6161ff',
+    secondary: '#0096d6',
+    disclaimer:
+      'Specifications summarized from publicly available Poly product documentation. This site is unaffiliated with Poly (HP).',
+    resourceLinks: [
+      {
+        label: 'Poly Lens ↗',
+        url: 'https://www.poly.com/us/en/products/services/poly-lens',
+        meta: 'Cloud management',
+        icon: '⊞',
+      },
+      {
+        label: 'Studio portfolio ↗',
+        url: 'https://www.poly.com/us/en/products/video-conferencing/studio-room-solutions',
+        meta: 'Room systems',
+        icon: '⎔',
+      },
+    ],
+  },
+  neat: {
+    id: 'neat',
+    name: 'Neat',
+    website: 'https://www.neat.no',
+    primary: '#ffffff',
+    secondary: '#a3a3a3',
+    disclaimer:
+      'Specifications summarized from publicly available Neat product documentation. This site is unaffiliated with Neat.',
+    resourceLinks: [
+      {
+        label: 'Neat support ↗',
+        url: 'https://support.neat.no',
+        meta: 'Documentation',
+        icon: '⊞',
+      },
+      {
+        label: 'Neat App ↗',
+        url: 'https://www.neat.no/neat-app/',
+        meta: 'Device management',
+        icon: '⌗',
+      },
+    ],
+  },
+}
+
+export function vendorConfig(vendorId: VendorId): VendorConfig {
+  return VENDORS[vendorId]
+}
