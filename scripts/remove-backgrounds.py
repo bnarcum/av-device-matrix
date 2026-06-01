@@ -23,6 +23,11 @@ The brochure embeds two flavors of product imagery:
      promotes any soft mid-alpha rim to fully opaque so dark bezels
      don't render as ghostly translucent frames against the scene.
 
+  3. Flat RGB on a near-black studio background (Neat card art from
+     cdn.neat.no). White-key cannot remove the backdrop; we flood-fill
+     near-black pixels connected to the image edge, optionally union
+     with rembg for soft rims.
+
 Re-running is safe — each image is read, processed, and written back
 in place.
 """
@@ -54,6 +59,14 @@ NATIVE_ALPHA_TRANSPARENT_PCT = 0.01
 # high means metallic specular highlights on chrome (~240-248) stay
 # classified as foreground.
 WHITE_TOL = 250
+
+# Near-black studio backdrops (Neat product cards). Pixels whose min(R,G,B)
+# is at or below this value are candidates for the black-key flood fill.
+BLACK_TOL = 42
+
+# Classify black-bg vs white-bg from edge pixel statistics.
+BLACK_BG_EDGE_FRAC = 0.62
+WHITE_BG_EDGE_FRAC = 0.62
 
 # Morphological closing radius (in pixels) applied to the white-key
 # foreground mask. Closes small gaps caused by very bright specular
@@ -103,14 +116,59 @@ HOLE_PUNCH_BLACK_TOL = 30  # RGB.min() < this counts as "deep black"
 HOLE_PUNCH_OPAQUE_TOL = 200  # alpha >= this is "fully opaque foreground"
 
 
+def _edge_pixels(rgb: np.ndarray) -> np.ndarray:
+    """Return (N, 3) RGB samples from the image border (1 px)."""
+    h, w = rgb.shape[:2]
+    top = rgb[0, :, :]
+    bottom = rgb[h - 1, :, :]
+    left = rgb[:, 0, :]
+    right = rgb[:, w - 1, :]
+    return np.concatenate([top, bottom, left, right], axis=0)
+
+
+def edge_tone_fractions(rgba: Image.Image) -> tuple[float, float]:
+    """Return (near_black_frac, near_white_frac) along the image edge."""
+    rgb = np.asarray(rgba.convert("RGB"))
+    edge = _edge_pixels(rgb)
+    mins = edge.min(axis=1)
+    black = (mins <= BLACK_TOL).mean()
+    white = (mins >= WHITE_TOL).mean()
+    return float(black), float(white)
+
+
+def is_black_bg_source(rgba: Image.Image) -> bool:
+    """True when the border is predominantly a near-black studio backdrop."""
+    black, white = edge_tone_fractions(rgba)
+    return black >= BLACK_BG_EDGE_FRAC and white < 0.12
+
+
+def is_white_bg_source(rgba: Image.Image) -> bool:
+    """True when the border is predominantly a white page backdrop."""
+    black, white = edge_tone_fractions(rgba)
+    return white >= WHITE_BG_EDGE_FRAC and black < 0.12
+
+
 def has_native_alpha(img: Image.Image) -> bool:
     """True if the source image already carries a meaningful cutout
-    alpha channel (i.e. it's a pre-cut PNG, not a white-bg JPEG)."""
+    alpha channel (i.e. it's a pre-cut PNG, not a white-bg JPEG).
+
+    Rejects "fake" cutouts where rembg left a mostly-opaque black matte
+    with only a thin transparent fringe (common on Neat card JPGs).
+    """
     if img.mode not in ("RGBA", "LA", "PA"):
         return False
     rgba = img.convert("RGBA")
     a = np.asarray(rgba)[:, :, 3]
-    return (a <= 4).mean() >= NATIVE_ALPHA_TRANSPARENT_PCT
+    transparent_pct = (a <= 4).mean()
+    if transparent_pct < NATIVE_ALPHA_TRANSPARENT_PCT:
+        return False
+    # Real brochure cutouts are mostly transparent padding around the product.
+    if transparent_pct < 0.08:
+        return False
+    black, _white = edge_tone_fractions(rgba)
+    if black >= BLACK_BG_EDGE_FRAC and transparent_pct < 0.35:
+        return False
+    return True
 
 
 def harden_alpha(img: Image.Image) -> Image.Image:
@@ -169,22 +227,40 @@ def white_key_foreground(rgba: Image.Image) -> np.ndarray:
     return fg
 
 
-def union_alpha(rembg_out: Image.Image, src_rgba: Image.Image) -> Image.Image:
-    """Final alpha = max(rembg's mask, white-key features that connect
-    to it).
+def black_key_foreground(rgba: Image.Image) -> np.ndarray:
+    """Flood-fill near-black pixels connected to the image edge.
 
-    rembg gives us soft semantic confidence which is great for shadow
-    fade-outs; the white-key gives us a hard geometric truth for
-    "anything not connected to the white page". We don't union them
-    blindly — that would also rescue isolated watermarks/glyphs.
-    Instead we keep only the connected components in the union mask
-    that overlap with rembg's confident detection. Net effect: rembg
-    defines what the device is, and the white-key fills in any thin
-    structurally-attached part rembg dropped.
+    Neat (and similar) card art uses a uniform black studio backdrop.
+    Light-colored products do not connect to the border through black
+    pixels, so they remain foreground.
     """
+    arr = np.asarray(rgba.convert("RGB"))
+    near_black = arr.min(axis=2) <= BLACK_TOL
+    labels, _ = ndimage.label(near_black)
+    edge_ids: set[int] = set()
+    edge_ids.update(int(v) for v in labels[0, :])
+    edge_ids.update(int(v) for v in labels[-1, :])
+    edge_ids.update(int(v) for v in labels[:, 0])
+    edge_ids.update(int(v) for v in labels[:, -1])
+    edge_ids.discard(0)
+    if not edge_ids:
+        return np.ones(arr.shape[:2], dtype=bool)
+    bg = np.isin(labels, list(edge_ids))
+    fg = ~bg
+    if CLOSE_RADIUS > 0:
+        struct = ndimage.generate_binary_structure(2, 2)
+        fg = ndimage.binary_closing(fg, structure=struct,
+                                    iterations=CLOSE_RADIUS)
+    return fg
+
+
+def union_alpha(rembg_out: Image.Image, src_rgba: Image.Image,
+                key_foreground) -> Image.Image:
+    """Final alpha = max(rembg's mask, geometric key features that connect
+    to rembg's confident detection."""
     rembg_alpha = np.asarray(rembg_out.split()[-1])
     rembg_solid = rembg_alpha >= 128
-    fg = white_key_foreground(src_rgba)
+    fg = key_foreground(src_rgba)
     union_mask = fg | rembg_solid
     structure = np.ones((3, 3), dtype=bool)  # 8-connectivity
     labels, _ = ndimage.label(union_mask, structure=structure)
@@ -195,6 +271,16 @@ def union_alpha(rembg_out: Image.Image, src_rgba: Image.Image) -> Image.Image:
     combined = np.maximum(rembg_alpha, rescued)
     rgb = np.asarray(rembg_out.convert("RGBA"))[:, :, :3]
     return Image.fromarray(np.dstack([rgb, combined]).astype(np.uint8))
+
+
+def alpha_from_key(src_rgba: Image.Image, key_foreground) -> Image.Image:
+    """Build RGBA using only a white- or black-key mask (no rembg)."""
+    fg = key_foreground(src_rgba)
+    arr = np.asarray(src_rgba.convert("RGBA"))
+    alpha = np.where(fg, 255, 0).astype(np.uint8)
+    out = arr.copy()
+    out[:, :, 3] = alpha
+    return Image.fromarray(out, mode="RGBA")
 
 
 def trim_transparent(img: Image.Image) -> Image.Image:
@@ -257,11 +343,40 @@ def punch_enclosed_dark(img: Image.Image, min_area_pct: float) -> Image.Image:
 
 def process_white_bg(src: Image.Image, session, punch_params=None) -> Image.Image:
     cut = remove(src, session=session)
-    cut = union_alpha(cut, src)
+    cut = union_alpha(cut, src, white_key_foreground)
     cut = harden_alpha(cut)
     if punch_params is not None:
         cut = punch_enclosed_dark(cut, **punch_params)
     return trim_transparent(cut)
+
+
+def process_black_bg(src: Image.Image, session, punch_params=None) -> Image.Image:
+    """Near-black studio cards: geometric black-key first, rembg union for rims."""
+    key_cut = alpha_from_key(src, black_key_foreground)
+    key_cut = harden_alpha(key_cut)
+    rembg_out = remove(src, session=session)
+    cut = union_alpha(rembg_out, src, black_key_foreground)
+    # Prefer the larger foreground area of the two masks (key usually wins on
+    # uniform black; rembg helps anti-aliased edges).
+    key_a = np.asarray(key_cut.split()[-1])
+    cut_a = np.asarray(cut.split()[-1])
+    combined_a = np.maximum(key_a, cut_a)
+    rgb = np.asarray(src.convert("RGB"))
+    cut = Image.fromarray(
+        np.dstack([rgb, combined_a]).astype(np.uint8), mode="RGBA"
+    )
+    cut = harden_alpha(cut)
+    if punch_params is not None:
+        cut = punch_enclosed_dark(cut, **punch_params)
+    return trim_transparent(cut)
+
+
+def flatten_to_rgb(img: Image.Image, backdrop: tuple[int, int, int] = (0, 0, 0)) -> Image.Image:
+    """Drop a broken/partial alpha channel by compositing onto a solid backdrop."""
+    rgba = img.convert("RGBA")
+    bg = Image.new("RGB", rgba.size, backdrop)
+    bg.paste(rgba, mask=rgba.getchannel("A"))
+    return bg
 
 
 def process_native_alpha(src: Image.Image, punch_params=None) -> Image.Image:
@@ -310,6 +425,7 @@ def main() -> int:
     after = 0
     native_count = 0
     rembg_count = 0
+    black_count = 0
     punched_count = 0
 
     for i, f in enumerate(files, 1):
@@ -323,10 +439,19 @@ def main() -> int:
                 tag = "native"
                 native_count += 1
             else:
-                src_rgba = src.convert("RGBA")
-                cut = process_white_bg(src_rgba, session, punch_params=punch_params)
-                tag = "rembg "
-                rembg_count += 1
+                # Ignore junk alpha left by a prior rembg pass (Neat card art).
+                flat_rgb = flatten_to_rgb(src)
+                src_rgba = flat_rgb.convert("RGBA")
+                if is_black_bg_source(src_rgba):
+                    cut = process_black_bg(src_rgba, session,
+                                           punch_params=punch_params)
+                    tag = "black "
+                    black_count += 1
+                else:
+                    cut = process_white_bg(src_rgba, session,
+                                           punch_params=punch_params)
+                    tag = "white "
+                    rembg_count += 1
             if punch_params is not None:
                 punched_count += 1
             cut.save(f, "WEBP", quality=86, method=6, lossless=False)
@@ -341,6 +466,7 @@ def main() -> int:
 
     print()
     print(f"native-alpha (passthrough): {native_count}")
+    print(f"black-key + rembg:          {black_count}")
     print(f"rembg + white-key:          {rembg_count}")
     print(f"hole-punch applied:         {punched_count}")
     print(f"total: {before/1024:.0f} KB -> {after/1024:.0f} KB"
