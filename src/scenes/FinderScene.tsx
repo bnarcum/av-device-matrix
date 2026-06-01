@@ -186,6 +186,8 @@ const PREVIEW_IDS = [
   'logitech-tap-ip',
   'poly-studio-e70',
   'logitech-scribe',
+  'poly-ccx-700',
+  'poly-voyager-focus-2',
 ]
 
 function computeTargets(
@@ -377,6 +379,8 @@ export const FINDER_QUESTIONS = [
         value: 'peripheral' as Category,
         hint: 'Tap, Pad, scheduling, audio',
       },
+      { label: 'Phone', value: 'phone' as Category, hint: 'Desk & conference' },
+      { label: 'Headset', value: 'headset' as Category, hint: 'USB, Bluetooth, DECT' },
     ],
   },
 ] as const

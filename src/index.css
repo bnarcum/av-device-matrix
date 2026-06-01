@@ -1457,6 +1457,8 @@ a:hover {
   color: #001724;
 }
 
+/* Poly voice products use same vendor pill colors as Studio (data-vendor='poly'). */
+
 .aisle-tile-meta {
   font-size: 0.66rem;
   color: rgba(229, 234, 240, 0.65);

@@ -444,6 +444,24 @@ function buildSections(
       label: 'Controllers',
       match: (d) => d.category === 'peripheral' && d.shape === 'navigator',
     },
+    {
+      id: 'desk-phones',
+      category: 'phone',
+      label: 'Desk phones',
+      match: (d) => d.category === 'phone' && d.shape === 'desk-phone',
+    },
+    {
+      id: 'conference-phones',
+      category: 'phone',
+      label: 'Conference phones',
+      match: (d) => d.category === 'phone' && d.shape === 'conference-phone',
+    },
+    {
+      id: 'headsets',
+      category: 'headset',
+      label: CATEGORY_LABELS.headset,
+      match: (d) => d.category === 'headset',
+    },
   ]
 
   const sections: AisleSection[] = []

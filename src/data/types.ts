@@ -2,7 +2,7 @@
 
 export type VendorId = 'logitech' | 'poly' | 'neat'
 
-export type Category = 'room' | 'peripheral' | 'camera'
+export type Category = 'room' | 'peripheral' | 'camera' | 'phone' | 'headset'
 
 export type RoomSize =
   | 'personal'
@@ -61,9 +61,17 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   room: 'Room systems',
   peripheral: 'Controllers & audio',
   camera: 'Cameras',
+  phone: 'Phones',
+  headset: 'Headsets',
 }
 
-export const CATEGORY_ORDER: Category[] = ['room', 'camera', 'peripheral']
+export const CATEGORY_ORDER: Category[] = [
+  'room',
+  'camera',
+  'peripheral',
+  'phone',
+  'headset',
+]
 
 export const ROOM_SIZE_LABELS: Record<RoomSize, string> = {
   personal: 'Personal / desk',

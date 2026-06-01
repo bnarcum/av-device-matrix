@@ -1,8 +1,9 @@
 import type { Device } from '../types'
+import { POLY_VOICE_DEVICES } from './poly-voice'
 
 const SURFACE = '#2d2d35'
 
-export const POLY_DEVICES: Device[] = [
+const POLY_STUDIO_DEVICES: Device[] = [
   {
     id: 'poly-studio-x30',
     vendorId: 'poly',
@@ -215,4 +216,9 @@ export const POLY_DEVICES: Device[] = [
     shape: 'video-bar',
     size: [0.35, 0.06, 0.05],
   },
+]
+
+export const POLY_DEVICES: Device[] = [
+  ...POLY_STUDIO_DEVICES,
+  ...POLY_VOICE_DEVICES,
 ]

@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import type { Category, RoomSize } from '../data/types'
+import { CATEGORY_LABELS, type Category, type RoomSize } from '../data/types'
 import { FINDER_QUESTIONS } from '../scenes/FinderScene'
 
 export interface FinderState {
@@ -122,12 +122,5 @@ function formatSize(s: RoomSize) {
   }[s]
 }
 function formatCategory(c: Category) {
-  return {
-    room: 'Room device',
-    desk: 'Desk device',
-    phone: 'Phone',
-    headset: 'Headset',
-    peripheral: 'Peripheral',
-    camera: 'Camera',
-  }[c]
+  return CATEGORY_LABELS[c]
 }

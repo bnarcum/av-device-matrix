@@ -68,6 +68,69 @@ IMAGE_SOURCES: dict[str, str] = {
         "https://www.hp.com/content/dam/sites/worldwide/poly/video-conferencing/"
         "Poly_Studio_R30_Desktop@2x.png"
     ),
+    # Poly — phones & headsets (HP worldwide DAM)
+    "poly-edge-b10": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/desk-phones/"
+        "edge-b-series/Poly-Edge-B10-Desktop.png"
+    ),
+    "poly-edge-b20": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/desk-phones/"
+        "edge-b-series/Poly-Edge-B20-Desktop.png"
+    ),
+    "poly-edge-b30": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/desk-phones/"
+        "edge-b-series/Poly-Edge-B30-Desktop.png"
+    ),
+    "poly-ccx-400": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/phones/Poly_CCX_400_Card@2x.jpg"
+    ),
+    "poly-ccx-505": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/phones/Poly_ccx_505@2x.jpg"
+    ),
+    "poly-ccx-600": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/desk-phones/ccx-600/"
+        "PolyCCX600_Desktop.png"
+    ),
+    "poly-ccx-700": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/desk-phones/CCX%20700@2x.png"
+    ),
+    "poly-trio-8300": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/phones/Poly_trio_8300@2x.jpg"
+    ),
+    "poly-trio-8500": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/phones/Poly_trio_8800@2x.jpg"
+    ),
+    "poly-trio-8800": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/phones/Poly_trio_8800@2x.jpg"
+    ),
+    "poly-blackwire-5200": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/headsets/"
+        "Poly_blackwire_5200_series_desktop@2x.jpg"
+    ),
+    "poly-blackwire-8225": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/headsets/"
+        "Poly_blackwire_8225_desktop@2x.jpg"
+    ),
+    "poly-voyager-4300": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/headsets/"
+        "Poly_voyager_4300_uc_series@2x.jpg"
+    ),
+    "poly-voyager-5200": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/headsets/"
+        "Poly_voyager_5200_series@2x.jpg"
+    ),
+    "poly-voyager-focus-2": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/headsets/"
+        "Poly_voyager_focus_2_desktop@2x.jpg"
+    ),
+    "poly-savi-7310": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/headsets/"
+        "Poly_savi_7300_uc_series_desktop@2x.jpg"
+    ),
+    "poly-encorepro-710": (
+        "https://www.hp.com/content/dam/sites/worldwide/poly/headsets/"
+        "Poly_encore_pro_700_series_desktop@2x.jpg"
+    ),
     # Neat — product card art from cdn.neat.no
     "neat-bar": "https://cdn.neat.no/ndk/1.0/assets/img/card-product/bar-2--2x.jpg",
     "neat-bar-pro": "https://cdn.neat.no/ndk/1.0/assets/img/card-product/bar-pro--2x.jpg",

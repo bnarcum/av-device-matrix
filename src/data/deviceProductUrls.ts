@@ -38,6 +38,31 @@ export const DEVICE_PRODUCT_URLS: Readonly<Record<string, string>> = {
   'poly-studio-p15':
     'https://www.poly.com/us/en/products/video-conferencing/studio-room-solutions/studio-p15',
 
+  'poly-edge-b10': 'https://www.poly.com/us/en/products/phones/desk-phones/edge-b10',
+  'poly-edge-b20': 'https://www.poly.com/us/en/products/phones/desk-phones/edge-b20',
+  'poly-edge-b30': 'https://www.poly.com/us/en/products/phones/desk-phones/edge-b30',
+  'poly-ccx-400': 'https://www.poly.com/us/en/products/phones/desk-phones/ccx-400',
+  'poly-ccx-505': 'https://www.poly.com/us/en/products/phones/desk-phones/ccx-505',
+  'poly-ccx-600': 'https://www.poly.com/us/en/products/phones/desk-phones/ccx-600',
+  'poly-ccx-700': 'https://www.poly.com/us/en/products/phones/desk-phones/ccx-700',
+  'poly-trio-8300': 'https://www.poly.com/us/en/products/phones/conference-phones/trio-8300',
+  'poly-trio-8500': 'https://www.poly.com/us/en/products/phones/conference-phones/trio-8500',
+  'poly-trio-8800': 'https://www.poly.com/us/en/products/phones/conference-phones/trio-8800',
+  'poly-blackwire-5200':
+    'https://www.poly.com/us/en/products/headsets/usb-headsets/blackwire-5200-series',
+  'poly-blackwire-8225':
+    'https://www.poly.com/us/en/products/headsets/usb-headsets/blackwire-8225',
+  'poly-voyager-4300':
+    'https://www.poly.com/us/en/products/headsets/bluetooth-headsets/voyager-4300-series',
+  'poly-voyager-5200':
+    'https://www.poly.com/us/en/products/headsets/bluetooth-headsets/voyager-5200',
+  'poly-voyager-focus-2':
+    'https://www.poly.com/us/en/products/headsets/voyager-focus-2',
+  'poly-savi-7310':
+    'https://www.poly.com/us/en/products/headsets/dect-wireless-headsets/savi-7300-series',
+  'poly-encorepro-710':
+    'https://www.poly.com/us/en/products/headsets/contact-center-headsets/encorepro-700-series',
+
   'neat-bar': 'https://www.neat.no/neat-bar/',
   'neat-bar-pro': 'https://www.neat.no/neat-bar-pro/',
   'neat-board-50': 'https://www.neat.no/neat-board/',

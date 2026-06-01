@@ -250,7 +250,7 @@ export default function App() {
           <div>
             <div className="brand-title">A/V Device Matrix</div>
             <div className="brand-sub">
-              Logitech · Poly · Neat · Interactive 3D
+              Logitech · Poly · Neat · Rooms, phones & headsets
             </div>
           </div>
         </div>
