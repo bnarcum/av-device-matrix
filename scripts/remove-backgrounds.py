@@ -217,7 +217,9 @@ def white_key_foreground(rgba: Image.Image) -> np.ndarray:
     edge_ids.update(int(v) for v in labels[:, -1])
     edge_ids.discard(0)
     if not edge_ids:
-        return np.ones(arr.shape[:2], dtype=bool)
+        # No near-white backdrop (e.g. light-gray studio). Skip white-key so
+        # rembg's mask is not overwritten to fully opaque.
+        return np.zeros(arr.shape[:2], dtype=bool)
     bg = np.isin(labels, list(edge_ids))
     fg = ~bg
     if CLOSE_RADIUS > 0:
@@ -244,7 +246,7 @@ def black_key_foreground(rgba: Image.Image) -> np.ndarray:
     edge_ids.update(int(v) for v in labels[:, -1])
     edge_ids.discard(0)
     if not edge_ids:
-        return np.ones(arr.shape[:2], dtype=bool)
+        return np.zeros(arr.shape[:2], dtype=bool)
     bg = np.isin(labels, list(edge_ids))
     fg = ~bg
     if CLOSE_RADIUS > 0:
@@ -252,6 +254,45 @@ def black_key_foreground(rgba: Image.Image) -> np.ndarray:
         fg = ndimage.binary_closing(fg, structure=struct,
                                     iterations=CLOSE_RADIUS)
     return fg
+
+
+# Light-gray studio backdrops (Poly E70 @2x.jpg uses ~230/230/230).
+GRAY_BG_MIN = 215
+GRAY_BG_SPREAD_MAX = 20
+
+
+def gray_key_foreground(rgba: Image.Image) -> np.ndarray:
+    """Flood-fill flat light-gray pixels connected to the image edge."""
+    arr = np.asarray(rgba.convert("RGB"))
+    spread = arr.max(axis=2) - arr.min(axis=2)
+    near_gray = (arr.min(axis=2) >= GRAY_BG_MIN) & (spread <= GRAY_BG_SPREAD_MAX)
+    labels, _ = ndimage.label(near_gray)
+    edge_ids: set[int] = set()
+    edge_ids.update(int(v) for v in labels[0, :])
+    edge_ids.update(int(v) for v in labels[-1, :])
+    edge_ids.update(int(v) for v in labels[:, 0])
+    edge_ids.update(int(v) for v in labels[:, -1])
+    edge_ids.discard(0)
+    if not edge_ids:
+        return np.zeros(arr.shape[:2], dtype=bool)
+    bg = np.isin(labels, list(edge_ids))
+    fg = ~bg
+    if CLOSE_RADIUS > 0:
+        struct = ndimage.generate_binary_structure(2, 2)
+        fg = ndimage.binary_closing(fg, structure=struct,
+                                    iterations=CLOSE_RADIUS)
+    return fg
+
+
+def is_gray_bg_source(rgba: Image.Image) -> bool:
+    """True when the border is a uniform light-gray studio backdrop."""
+    rgb = np.asarray(rgba.convert("RGB"))
+    edge = _edge_pixels(rgb)
+    spread = edge.max(axis=1) - edge.min(axis=1)
+    mins = edge.min(axis=1)
+    gray = (mins >= GRAY_BG_MIN) & (spread <= GRAY_BG_SPREAD_MAX)
+    black, white = edge_tone_fractions(rgba)
+    return gray.mean() >= 0.55 and white < 0.12 and black < 0.12
 
 
 def union_alpha(rembg_out: Image.Image, src_rgba: Image.Image,
@@ -342,8 +383,13 @@ def punch_enclosed_dark(img: Image.Image, min_area_pct: float) -> Image.Image:
 
 
 def process_white_bg(src: Image.Image, session, punch_params=None) -> Image.Image:
+    key_fn = (
+        gray_key_foreground
+        if is_gray_bg_source(src)
+        else white_key_foreground
+    )
     cut = remove(src, session=session)
-    cut = union_alpha(cut, src, white_key_foreground)
+    cut = union_alpha(cut, src, key_fn)
     cut = harden_alpha(cut)
     if punch_params is not None:
         cut = punch_enclosed_dark(cut, **punch_params)
@@ -447,6 +493,11 @@ def main() -> int:
                                            punch_params=punch_params)
                     tag = "black "
                     black_count += 1
+                elif is_gray_bg_source(src_rgba):
+                    cut = process_white_bg(src_rgba, session,
+                                           punch_params=punch_params)
+                    tag = "gray  "
+                    rembg_count += 1
                 else:
                     cut = process_white_bg(src_rgba, session,
                                            punch_params=punch_params)
